@@ -1,6 +1,20 @@
 # Judgment
 
-**TODO: Add description**
+> **WORK in PROGRESS**
+> 
+> This library is not yet ready to be used. 
+
+Resolve Majority Judgment polls and get the rank of each proposal[^candidate].
+
+[^candidate]: anthopocentrically known as candidate
+
+
+## Features
+
+- Tests
+- Efficient, score-based algorithm
+- Noob mistakes _(contributions are welcome!)_
+
 
 ## Installation
 
@@ -19,3 +33,7 @@ Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_do
 and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
 be found at [https://hexdocs.pm/judgment](https://hexdocs.pm/judgment).
 
+## Disclaimer
+
+This is our first Elixir project.
+This codebase needs a review by an experimented alchemist.
