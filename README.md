@@ -2,7 +2,7 @@
 
 > **WORK in PROGRESS**
 > 
-> This library is not yet ready to be used. 
+> This library is under construction and not yet ready to be used. 
 
 Resolve Majority Judgment polls and get the rank of each proposal[^candidate].
 
@@ -35,5 +35,6 @@ be found at [https://hexdocs.pm/judgment](https://hexdocs.pm/judgment).
 
 ## Disclaimer
 
-This is our first Elixir project.
-This codebase needs a review by an experimented alchemist.
+This is our first Elixir project.  It will show in the code.
+This codebase needs a review by an experimented alchemist.  Please?
+We're all in this together !

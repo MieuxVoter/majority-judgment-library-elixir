@@ -24,3 +24,6 @@ judgment-*.tar
 
 # Temporary files, for example, from tests.
 /tmp/
+
+# IML files
+*.iml
