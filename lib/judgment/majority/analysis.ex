@@ -1,6 +1,7 @@
 defmodule Judgment.Majority.Analysis do
   @moduledoc """
   An analysis of the tally of a single proposal (its merit profile).
+  This does not hold the score nor the rank and is used to compute the score.
   """
   defstruct [
     :medianGrade,
@@ -14,9 +15,15 @@ defmodule Judgment.Majority.Analysis do
   ]
 
   def runOn(proposalTally) do
-#    IO.inspect(proposalTally, label: "Running analysis on")
+    runOn(proposalTally, true)
+  end
 
-    favorContestation = true
+  @doc """
+  Run the analysis on the provided proposal tally.
+  Returns a Judgment.Majority.Analysis
+  """
+  def runOn(proposalTally, favorContestation) do
+#    IO.inspect(proposalTally, label: "Running analysis on")
 
     amountOfJudgments = proposalTally |> Enum.sum()
 
@@ -26,24 +33,23 @@ defmodule Judgment.Majority.Analysis do
       else
         amountOfJudgments
       end
-      |> div(2)
+      |> div(2)  # euclidean
 
     cumul =
       proposalTally
       |> Enum.scan(fn (a, b) -> a + b end)
 #      |> Enum.scan(&(&1 + &2))  # less obvious equivalent
-#      |> IO.inspect(label: "cumul")
 
     merit =
       proposalTally
       |> Enum.with_index()
-      |> Enum.zip(
+      |> Enum.zip(  # add start
            [0 | cumul]
            |> Enum.reverse()
            |> tl()
            |> Enum.reverse()
          )
-      |> Enum.zip(cumul)
+      |> Enum.zip(cumul)  # add stop
       |> Enum.map(
            fn {{{gradeTally, index}, start}, stop} ->
              {index, gradeTally, start, stop}
@@ -144,17 +150,6 @@ defmodule Judgment.Majority.Analysis do
          end
        )
   end
-
-#  defp sumByType(merit, discriminator) do
-#    merit
-#    |> filterByType(discriminator)
-#    |> Enum.map(
-#         fn {_index, gradeTally, _start, _stop, _type} ->
-#           gradeTally
-#         end
-#       )
-#    |> Enum.sum()
-#  end
 
   defp sum(merit) do
     merit
