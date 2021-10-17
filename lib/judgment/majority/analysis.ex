@@ -23,7 +23,6 @@ defmodule Judgment.Majority.Analysis do
   Returns a Judgment.Majority.Analysis
   """
   def runOn(proposalTally, favorContestation) do
-#    IO.inspect(proposalTally, label: "Running analysis on")
 
     amountOfJudgments = proposalTally |> Enum.sum()
 
@@ -72,7 +71,6 @@ defmodule Judgment.Majority.Analysis do
              end
            end
          )
-#      |> IO.inspect(label: "merit")
 
     medianGrade =
       merit
@@ -83,13 +81,11 @@ defmodule Judgment.Majority.Analysis do
            end
          )
       |> hd()
-#      |> IO.inspect(label: "medianGrade")
 
     contestationGroup = merit |> filterByType(:contestation)
     adhesionGroup = merit |> filterByType(:adhesion)
 
     contestationGroupSize = contestationGroup |> sum()
-#      |> IO.inspect(label: "contestation")
 
     contestationGroupGrade =
       contestationGroup
@@ -98,7 +94,6 @@ defmodule Judgment.Majority.Analysis do
       |> Enum.reverse()
       |> List.first()
       |> default(0)
-#      |> IO.inspect(label: "contestationGroupGrade")
 
     adhesionGroupGrade =
       adhesionGroup
@@ -106,10 +101,8 @@ defmodule Judgment.Majority.Analysis do
       |> fetchIndex()
       |> List.first()
       |> default(0)
-#      |> IO.inspect(label: "adhesionGroupGrade")
 
     adhesionGroupSize = adhesionGroup |> sum()
-#      |> IO.inspect(label: "adhesion")
 
     contestationIsBiggest = if favorContestation do
       contestationGroupSize >= adhesionGroupSize
