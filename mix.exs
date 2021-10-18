@@ -5,6 +5,7 @@ defmodule Judgment.MixProject do
     [
       app: :judgment,
       version: "0.1.0",
+      # Perhaps we can go lower than 1.12?
       elixir: "~> 1.12",
       start_permanent: Mix.env() == :prod,
       deps: deps()
