@@ -4,7 +4,7 @@ defmodule Judgment.Majority.PollResult do
   """
   defstruct [
     :proposals,
-    :sortedProposals,
+    :sorted_proposals,
     # etc.
   ]
 end

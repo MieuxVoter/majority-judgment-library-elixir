@@ -4,45 +4,47 @@ defmodule Judgment.Majority.Analysis do
   This does not hold the score nor the rank and is used to compute the score.
   """
   defstruct [
-    :medianGrade,
-    :secondGroupGrade,
-    :secondGroupSize,
-    :secondGroupSign,
-    :adhesionGroupGrade,
-    :adhesionGroupSize,
-    :contestationGroupGrade,
-    :contestationGroupSize,
+    :median_grade,
+    :second_group_grade,
+    :second_group_size,
+    :second_group_sign,
+    :adhesion_group_grade,
+    :adhesion_group_size,
+    :contestation_group_grade,
+    :contestation_group_size,
   ]
 
-  def runOn(proposalTally) do
-    runOn(proposalTally, true)
+  def run_on(proposal_tally) do
+    run_on(proposal_tally, true)
   end
 
   @doc """
   Run the analysis on the provided proposal tally.
-  Returns a Judgment.Majority.Analysis
+  Returns a Judgment.Majority.Analysis.
+  This is like a factory, I guess?
   """
-  def runOn(proposalTally, favorContestation) do
+  def run_on(proposal_tally, favor_contestation) do
 
-    amountOfJudgments = proposalTally |> Enum.sum()
-
-    medianThreshold =
-      if favorContestation do
-        amountOfJudgments - 1
+    amount_of_judgments = proposal_tally
+                          |> Enum.sum
+    median_threshold =
+      if favor_contestation do
+        amount_of_judgments - 1
       else
-        amountOfJudgments
+        amount_of_judgments
       end
       |> div(2)  # euclidean
 
     cumul =
-      proposalTally
+      proposal_tally
       |> Enum.scan(fn (a, b) -> a + b end)
-#      |> Enum.scan(&(&1 + &2))  # less obvious equivalent
+    # |> Enum.scan(&(&1 + &2))  # less obvious equivalent
 
     merit =
-      proposalTally
+      proposal_tally
       |> Enum.with_index()
-      |> Enum.zip(  # add start
+      |> Enum.zip(
+           # add start
            [0 | cumul]
            |> Enum.reverse()
            |> tl()
@@ -50,96 +52,114 @@ defmodule Judgment.Majority.Analysis do
          )
       |> Enum.zip(cumul)  # add stop
       |> Enum.map(
-           fn {{{gradeTally, index}, start}, stop} ->
-             {index, gradeTally, start, stop}
+           fn {{{grade_tally, index}, start}, stop} ->
+             {index, grade_tally, start, stop}
            end
          )
       |> Enum.map(
-           fn {index, gradeTally, start, stop} ->
-             if start < medianThreshold && stop <= medianThreshold do
-               {index, gradeTally, start, stop, :contestation}
+           fn {index, grade_tally, start, stop} ->
+             if start < median_threshold && stop <= median_threshold do
+               {index, grade_tally, start, stop, :contestation}
              else
-               if start <= medianThreshold && stop > medianThreshold do
-                 {index, gradeTally, start, stop, :majority}
+               if start <= median_threshold && stop > median_threshold do
+                 {index, grade_tally, start, stop, :majority}
                else
-                 if start > medianThreshold && stop > medianThreshold do
-                   {index, gradeTally, start, stop, :adhesion}
+                 if start > median_threshold && stop > median_threshold do
+                   {index, grade_tally, start, stop, :adhesion}
                  else
-                   {index, gradeTally, start, stop, :majority}
+                   {index, grade_tally, start, stop, :majority}
                  end
                end
              end
            end
          )
 
-    medianGrade =
+    median_grade =
       merit
-      |> filterByType(:majority)
+      |> filter_by_type(:majority)
       |> Enum.map(
-           fn {index, _gradeTally, _start, _stop, _type} ->
+           fn {index, _grade_tally, _start, _stop, _type} ->
              index
            end
          )
       |> hd()
 
-    contestationGroup = merit |> filterByType(:contestation)
-    adhesionGroup = merit |> filterByType(:adhesion)
+    contestationGroup =
+      merit
+      |> filter_by_type(:contestation)
+    adhesionGroup =
+      merit
+      |> filter_by_type(:adhesion)
 
-    contestationGroupSize = contestationGroup |> sum()
-
-    contestationGroupGrade =
+    contestation_group_size =
       contestationGroup
-      |> filterOnlyWithGrades()
-      |> fetchIndex()
-      |> Enum.reverse()
-      |> List.first()
-      |> default(0)
-
-    adhesionGroupGrade =
+      |> sum()
+    adhesion_group_size =
       adhesionGroup
-      |> filterOnlyWithGrades()
-      |> fetchIndex()
-      |> List.first()
+      |> sum()
+
+    contestation_group_grade =
+      contestationGroup
+      |> keep_only_with_grades
+      |> fetch_index
+      |> Enum.reverse
+      |> List.first
+      |> default(0)
+    adhesion_group_grade =
+      adhesionGroup
+      |> keep_only_with_grades
+      |> fetch_index
+      |> List.first
       |> default(0)
 
-    adhesionGroupSize = adhesionGroup |> sum()
-
-    contestationIsBiggest = if favorContestation do
-      contestationGroupSize >= adhesionGroupSize
+    contestation_is_biggest = if favor_contestation do
+      contestation_group_size >= adhesion_group_size
     else
-      contestationGroupSize > adhesionGroupSize
+      contestation_group_size > adhesion_group_size
     end
 
-    secondGroupGrade = if contestationIsBiggest do contestationGroupGrade else adhesionGroupGrade end
-    secondGroupSize = if contestationIsBiggest do contestationGroupSize else adhesionGroupSize end
-    secondGroupSign = if contestationIsBiggest do -1 else 1 end
+    second_group_grade = if contestation_is_biggest do
+      contestation_group_grade
+    else
+      adhesion_group_grade
+    end
+    second_group_size = if contestation_is_biggest do
+      contestation_group_size
+    else
+      adhesion_group_size
+    end
+    second_group_sign = if contestation_is_biggest do
+      -1
+    else
+      1
+    end
 
     %Judgment.Majority.Analysis {
-      medianGrade: medianGrade,
-      secondGroupGrade: secondGroupGrade,
-      secondGroupSize: secondGroupSize,
-      secondGroupSign: secondGroupSign,
-      adhesionGroupGrade: adhesionGroupGrade,
-      adhesionGroupSize: adhesionGroupSize,
-      contestationGroupGrade: contestationGroupGrade,
-      contestationGroupSize: contestationGroupSize,
+      median_grade: median_grade,
+      second_group_grade: second_group_grade,
+      second_group_size: second_group_size,
+      second_group_sign: second_group_sign,
+      adhesion_group_grade: adhesion_group_grade,
+      adhesion_group_size: adhesion_group_size,
+      contestation_group_grade: contestation_group_grade,
+      contestation_group_size: contestation_group_size,
     }
   end
 
-  defp filterByType(merit, discriminator) do
+  defp filter_by_type(merit, discriminator) do
     merit
     |> Enum.filter(
-         fn {_index, _gradeTally, _start, _stop, type} ->
+         fn {_index, _grade_tally, _start, _stop, type} ->
            type == discriminator
          end
        )
   end
 
-  def filterOnlyWithGrades(merit) do
+  defp keep_only_with_grades(merit) do
     merit
     |> Enum.filter(
-         fn {_index, gradeTally, _start, _stop, _type} ->
-           gradeTally > 0
+         fn {_index, grade_tally, _start, _stop, _type} ->
+           grade_tally > 0
          end
        )
   end
@@ -147,17 +167,17 @@ defmodule Judgment.Majority.Analysis do
   defp sum(merit) do
     merit
     |> Enum.map(
-         fn {_index, gradeTally, _start, _stop, _type} ->
-           gradeTally
+         fn {_index, grade_tally, _start, _stop, _type} ->
+           grade_tally
          end
        )
     |> Enum.sum()
   end
 
-  defp fetchIndex(merit) do
+  defp fetch_index(merit) do
     merit
     |> Enum.map(
-         fn {index, _gradeTally, _start, _stop, _type} ->
+         fn {index, _grade_tally, _start, _stop, _type} ->
            index
          end
        )

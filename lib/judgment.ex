@@ -1,18 +1,6 @@
 defmodule Judgment do
   @moduledoc """
-  Documentation for `Judgment`.
+  Root module, nothing to see here.
+  Try Judgment.Majority.resolve(…)
   """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Judgment.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
 end
