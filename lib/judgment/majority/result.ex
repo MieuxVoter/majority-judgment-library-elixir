@@ -4,7 +4,7 @@ defmodule Judgment.Majority.PollResult do
   """
   defstruct [
     :proposals,
-    :sorted_proposals,
+    :sorted_proposals
     # etc.
   ]
 end
@@ -17,6 +17,6 @@ defmodule Judgment.Majority.ProposalResult do
     :index,
     :rank,
     :score,
-    :analysis,
+    :analysis
   ]
 end
